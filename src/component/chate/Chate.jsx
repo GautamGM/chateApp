@@ -127,7 +127,7 @@ useEffect(()=>{
             <SentimentSatisfiedAltIcon sx={{color:"yellow"}} />
           </IconButton>
           {open && (
-            <div className="absolute bottom-10 left-0 rounded-lg">
+            <div className="absolute bottom-10 left-0 z-50 rounded-lg">
               <EmojiPicker onEmojiClick={handleEmojiClick} />
             </div>
           )}
