@@ -1,8 +1,12 @@
-import { Box, Button, TextField, Typography } from "@mui/material";
+import { Box, Button, createTheme, TextField, Typography } from "@mui/material";
 import { useForm, Controller } from "react-hook-form";
 import { userschema } from "../../../userSchema/userschema";
 import { yupResolver } from "@hookform/resolvers/yup/dist/yup.js";
+import { createuser } from "../../../redux/store";
+import { useDispatch } from "react-redux";
+import { toast } from "react-toastify";
 const RegisterPage = () => {
+  const dispatch= useDispatch()
   const {
     register,
     handleSubmit,
@@ -19,7 +23,15 @@ const RegisterPage = () => {
     mode: "onChange",
   });
   const handelLogin = (data) => {
-    console.log(data);
+   dispatch(createuser(data)).unwrap()
+   .then((data)=>{
+    toast.success("register successfully")
+    console.log(data,"data of thenin reguster")
+   })
+   .catch((error)=>{
+    toast.error("emial exist")
+    console.log(error,"error----->")
+   })
     reset();
   };
   return (
