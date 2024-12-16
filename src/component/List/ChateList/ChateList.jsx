@@ -1,18 +1,22 @@
 import { Box, Divider, IconButton,Typography } from '@mui/material'
-import React from 'react'
+import React, { useState } from 'react'
 import SearchIcon from '@mui/icons-material/Search';
 import AddIcon from '@mui/icons-material/Add';
 import RemoveIcon from '@mui/icons-material/Remove';
+import AddUser from './AddUser/AddUser';
+
 
 function ChateList() {
+  const [open,setOpen]=useState(false)
+
   return (
     <div className='p-1 '>
         {/* search barr of the chate list where user can serch the contact */}
         <Box sx={{display:"flex",alignItems:"center", color:"white"}}>
         <IconButton sx={{color:"white"}}><SearchIcon sx={{fontSize:"30px"}}/> </IconButton>
             <input type="text" placeholder='serach' className='border h-[30px] rounded-[15px] p-2 text-[black] ' />
-            <IconButton>
-                <AddIcon sx={{fontSize:"30px",color:"white"}}/>
+            <IconButton onClick={(()=>setOpen((prev)=>!prev))}>
+               {open?<RemoveIcon sx={{fontSize:"30px",color:"white"}} />: <AddIcon sx={{fontSize:"30px",color:"white"}}/>}
             </IconButton>
         </Box>
         {/* ------------------ */}
@@ -110,6 +114,8 @@ function ChateList() {
      <Divider sx={{backgroundColor:"white", margin:"10px"}}/>
      {/* ___________________END */}
       </div>
+      {/* adduser form  */}
+     <AddUser open={open} setOpen={setOpen}/>
     </div>
   )
 }

@@ -2,11 +2,12 @@ import { Box, Button, TextField, Typography } from "@mui/material";
 import { useForm, Controller } from "react-hook-form";
 import { userschema } from "../../../userSchema/userschema";
 import { yupResolver } from "@hookform/resolvers/yup";
-
+import { useDispatch } from "react-redux";
+import { loginuser } from "../../../redux/Slices/UserSlice";
 const LoginPage = () => {
 
   const loginSchema = userschema.pick(['email', 'password']);
-  
+  const dispatch=useDispatch()
   const {
     handleSubmit,
     reset,
@@ -23,7 +24,13 @@ const LoginPage = () => {
 
   // Handle form submission
   const handleLogin = (data) => {
-    console.log(data);
+    dispatch(loginuser(data)).unwrap()
+    .then((data)=>{
+      console.log(data,"data in login<-----")
+    })
+    .catch((error)=>{
+      console.log(error.code ,"erro in login page ")
+    })
     reset();
   };
 

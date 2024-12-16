@@ -8,7 +8,6 @@ import MicIcon from "@mui/icons-material/Mic";
 import SendIcon from "@mui/icons-material/Send";
 import SentimentSatisfiedAltIcon from "@mui/icons-material/SentimentSatisfiedAlt";
 import EmojiPicker from "emoji-picker-react";
-
 function UserChate() {
   const [open, setOpen] = useState(false);
   const [messages, setMessages] = useState([

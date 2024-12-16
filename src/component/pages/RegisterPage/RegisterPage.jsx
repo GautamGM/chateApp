@@ -5,8 +5,10 @@ import { yupResolver } from "@hookform/resolvers/yup/dist/yup.js";
 import { createuser } from "../../../redux/store";
 import { useDispatch } from "react-redux";
 import { toast } from "react-toastify";
+import { doc, setDoc } from "firebase/firestore";
+import { db } from "../../../firebase/configFire/config";
 const RegisterPage = () => {
-  const dispatch= useDispatch()
+  const dispatch = useDispatch();
   const {
     register,
     handleSubmit,
@@ -22,16 +24,26 @@ const RegisterPage = () => {
     resolver: yupResolver(userschema),
     mode: "onChange",
   });
-  const handelLogin = (data) => {
-   dispatch(createuser(data)).unwrap()
-   .then((data)=>{
-    toast.success("register successfully")
-    console.log(data,"data of thenin reguster")
-   })
-   .catch((error)=>{
-    toast.error("emial exist")
-    console.log(error,"error----->")
-   })
+  const hnadelRegister = (data) => {
+    dispatch(createuser(data)).unwrap()
+      .then( async (res) => {
+        await setDoc(doc(db, "user", res.user.uid), { //---->creating the data bse in fire store
+          username: data.name,//email
+          email: data.email,//password
+          blocked: [],
+          id: res.user.uid,//user id from when we registe rthe usser
+        });
+        // user chats
+        await setDoc(doc(db, "userChats", res.user.uid), {
+          chats: [],
+        });
+
+        toast.success("register successfully");
+      })
+      .catch((error) => {
+        toast.error(error);
+        console.log(error.message, "error----->");
+      });
     reset();
   };
   return (
@@ -40,7 +52,7 @@ const RegisterPage = () => {
         Register User
       </Typography>
       <form
-        onSubmit={handleSubmit(handelLogin)}
+        onSubmit={handleSubmit(hnadelRegister)}
         action=""
         className="flex flex-col border border-white h-[300px] w-[400px] p-3 justify-evenly"
       >
@@ -58,10 +70,8 @@ const RegisterPage = () => {
               }}
               label="name"
               variant="outlined"
-
               error={!!errors.name}
               helperText={errors.name?.message}
-
               sx={{
                 "& .MuiOutlinedInput-root": {
                   "& fieldset": {
