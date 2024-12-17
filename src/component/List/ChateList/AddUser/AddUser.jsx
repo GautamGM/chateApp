@@ -5,7 +5,7 @@ import Modal from "@mui/material/Modal";
 import Fade from "@mui/material/Fade";
 import Button from "@mui/material/Button";
 import Typography from "@mui/material/Typography";
-
+import { useForm } from "react-hook-form";
 const style = {
   position: "absolute",
   top: "50%",
@@ -16,13 +16,17 @@ const style = {
   border: "2px solid #000",
   boxShadow: 24,
   p: 4,
+  borderRadius: "12px",
 };
 
 export default function AddUser({ open, setOpen }) {
   //   const [open, setOpen] = React.useState(false);
-  const handleOpen = () => setOpen(true);
+  const { register, handleSubmit, reset } = useForm();
   const handleClose = () => setOpen(false);
 
+  const handelsearch = (data) => {
+    console.log(data.name, "serach");
+  };
   return (
     <div>
       <Modal
@@ -40,13 +44,29 @@ export default function AddUser({ open, setOpen }) {
       >
         <Fade in={open}>
           <Box sx={style}>
-            <Typography id="transition-modal-title" variant="h6" component="h2">
-              Text in a modal
-            </Typography>
-            <Typography id="transition-modal-description" sx={{ mt: 2 }}>
-              Duis mollis, est non commodo luctus, nisi erat porttitor ligula.
-            </Typography>
-            <Button variant="contained" onClick={handleClose}>close</Button>
+            <form
+              onSubmit={handleSubmit(handelsearch)}
+              className="flex justify-evenly items-center border p-2"
+            >
+              <input
+                {...register("name")}
+                name="name"
+                type="text"
+                className="border border-black p-2 rounded "
+              />
+              <Button type="submit" variant="contained">
+                {" "}
+                Search
+              </Button>
+            </form>
+            {/* ------------------------------------------------------------search end */}
+            <Box >
+              <Box className="flex justify-around items-center border mt-4 p-1 rounded-[15px]  bg-black text-white">
+                <img draggable={false} className="border  cover  w-[70px]  h-[70px] rounded-[100%]" src="https://imgs.search.brave.com/UXdec7X_4yQLzlYzDER10xY05FHewQoj7ueE5pkijhU/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly9tYWNo/b2xldmFudGUuY29t/L3dwLWNvbnRlbnQv/dXBsb2Fkcy8yMDI0/LzEyL2NvbXByZXNz/ZWRfaW1nLXRUYXdQ/ZXdHUU12OFBIWEg0/Q1phbjRveC5wbmc" alt="pic" />
+                <Typography variant="h6" >Gautam</Typography>
+                <Button variant="contained">Add+</Button>
+              </Box>
+            </Box>
           </Box>
         </Fade>
       </Modal>

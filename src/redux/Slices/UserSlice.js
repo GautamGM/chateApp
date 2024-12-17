@@ -14,6 +14,7 @@ export const createuser = createAsyncThunk(
         data.password
       );
       return res
+      
     } catch (error) {
        return thunkApi.rejectWithValue(getReadableAuthErrorMessage(error.code))
     }
@@ -40,10 +41,10 @@ export const loginuser = createAsyncThunk(
 export const logout=createAsyncThunk(
   "user/logput",async()=>{
     try{
-      const res=auth.signOut()
+      const res= await  auth.signOut()
       console.log(res,"sign out")
     }catch(error){
-
+      console.log(error)
     }
   }
 )

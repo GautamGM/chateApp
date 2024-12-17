@@ -1,10 +1,15 @@
 import React from 'react'
 import { Box, Divider, Typography ,Button} from '@mui/material'
 import { auth } from '../../firebase/configFire/config'
-import { useSelector } from 'react-redux'
+import { useSelector,useDispatch} from 'react-redux'
+import { logout } from '../../redux/Slices/UserSlice'
 
 function Detail() {
   const{currentUser}=useSelector((state)=>state.user)
+  const dispatch=useDispatch()
+  const handelout=()=>{
+    dispatch(logout())
+  }
   return (
     <div className='flex flex-1 '>
       <Box sx={{width:"100%"}}>
@@ -22,7 +27,7 @@ function Detail() {
         <Divider sx={{backgroundColor:"white"}}/>
        <div className='flex flex-col h-[100px] p-1 m-2 justify-between'>
        <Button variant='contained' >Block user</Button>
-       <Button variant='contained' onClick={(()=>auth.signOut())}>Log out</Button>
+       <Button variant='contained' onClick={handelout}>Log out</Button>
        </div>
       </Box>
     </div>
