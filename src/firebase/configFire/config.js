@@ -3,6 +3,7 @@ import { initializeApp } from "firebase/app";
 import { getAnalytics } from "firebase/analytics";
 import { config } from "./index.js"
 import { getAuth } from "firebase/auth";
+import {getFirestore} from "firebase/firestore"
 const firebaseConfig = {
   apiKey:config.api_Key ,
   authDomain: config.auth_domain,
@@ -18,3 +19,4 @@ const app = initializeApp(firebaseConfig);
 const analytics = getAnalytics(app);
 
 export const auth=getAuth(app)
+export const db=getFirestore()

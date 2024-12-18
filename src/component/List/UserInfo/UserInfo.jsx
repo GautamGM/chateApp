@@ -2,8 +2,10 @@ import { Box, Divider, IconButton, Typography } from "@mui/material";
 import React from "react";
 import DuoIcon from "@mui/icons-material/Duo";
 import CallIcon from "@mui/icons-material/Call";
-
+import { useSelector } from "react-redux";
 function UserInfo() {
+  const {currentUser}=useSelector((state)=>state.user)
+  console.log(currentUser,"currentUser")
   return (
     <div>
       <Box sx={{ display: "flex", alignItems: "center" }}>
@@ -15,12 +17,11 @@ function UserInfo() {
         />
        </IconButton>
         <Typography
-          variant="h6"
+          variant="subtitle1"
           m={1}
-          component={"subtitle1"}
           sx={{ fontSize: "23px", fontWeight: "600" }}
         >
-          Gautan
+        {currentUser?.username}
         </Typography>
 
         <Box className=" w-[40%] flex justify-evenly">
