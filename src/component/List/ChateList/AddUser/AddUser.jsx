@@ -6,6 +6,9 @@ import Fade from "@mui/material/Fade";
 import Button from "@mui/material/Button";
 import Typography from "@mui/material/Typography";
 import { useForm } from "react-hook-form";
+import { collection, getDoc, getDocs, query, where } from "firebase/firestore";
+import { db } from "../../../../firebase/configFire/config";
+import { toast } from "react-toastify";
 const style = {
   position: "absolute",
   top: "50%",
@@ -20,13 +23,46 @@ const style = {
 };
 
 export default function AddUser({ open, setOpen }) {
-  //   const [open, setOpen] = React.useState(false);
   const { register, handleSubmit, reset } = useForm();
   const handleClose = () => setOpen(false);
+  const [myuser, setMyUser] = React.useState([]);
 
-  const handelsearch = (data) => {
+  // const newValue = user.map((prev)=> {return (...prev , newValue)})
+  // setUser(newValue)
+  const handelsearch = async (data) => {
     console.log(data.name, "serach");
+    try {
+      const userRef = collection(db, "user");
+      let username = data.name;
+      // Create a query against the collection.
+      const q = query(userRef, where("username", "==", username));
+      console.log(q, "user");
+      const userSnapshot = await getDocs(q);
+      if (!userSnapshot.empty) {
+        console.log("entered if");
+        const userlist = userSnapshot.docs;
+        const newValue = userlist.map((elem) => {
+          console.log(elem, "elem");
+          const data = elem.data();
+          if(data){
+
+            return data;
+          }else{
+            return null
+          }
+        });
+
+        setMyUser(newValue);
+      }else{
+        console.log("hello else")
+       setMyUser([])
+       toast.info("no user found")
+      }
+    } catch (error) {
+      console.log(error, "error ");
+    }
   };
+  console.log(myuser, "my user----");
   return (
     <div>
       <Modal
@@ -60,12 +96,24 @@ export default function AddUser({ open, setOpen }) {
               </Button>
             </form>
             {/* ------------------------------------------------------------search end */}
-            <Box >
-              <Box className="flex justify-around items-center border mt-4 p-1 rounded-[15px]  bg-black text-white">
-                <img draggable={false} className="border  cover  w-[70px]  h-[70px] rounded-[100%]" src="https://imgs.search.brave.com/UXdec7X_4yQLzlYzDER10xY05FHewQoj7ueE5pkijhU/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly9tYWNo/b2xldmFudGUuY29t/L3dwLWNvbnRlbnQv/dXBsb2Fkcy8yMDI0/LzEyL2NvbXByZXNz/ZWRfaW1nLXRUYXdQ/ZXdHUU12OFBIWEg0/Q1phbjRveC5wbmc" alt="pic" />
-                <Typography variant="h6" >Gautam</Typography>
-                <Button variant="contained">Add+</Button>
-              </Box>
+            <Box>
+              {myuser?.map((user) => {
+                console.log(user,"reunuser")
+                return (
+                 <>
+                  <Box className="flex justify-around items-center border mt-4 p-1 rounded-[15px]  bg-black text-white">
+                    <img
+                      draggable={false}
+                      className="border  cover  w-[70px]  h-[70px] rounded-[100%]"
+                      src="https://imgs.search.brave.com/UXdec7X_4yQLzlYzDER10xY05FHewQoj7ueE5pkijhU/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly9tYWNo/b2xldmFudGUuY29t/L3dwLWNvbnRlbnQv/dXBsb2Fkcy8yMDI0/LzEyL2NvbXByZXNz/ZWRfaW1nLXRUYXdQ/ZXdHUU12OFBIWEg0/Q1phbjRveC5wbmc"
+                      alt="pic"
+                    />
+                    <Typography variant="h6">{user.username}</Typography>
+                    <Button variant="contained">Add+</Button>
+                  </Box>
+                 </>
+                );
+              })}
             </Box>
           </Box>
         </Fade>

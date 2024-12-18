@@ -51,7 +51,8 @@ export const logout=createAsyncThunk(
 
 // fetch userdata
 export const fetchuser=createAsyncThunk(
-  "user/fetchuser",async(id,thunkApi)=>{
+  "user/fetchuser",
+  async(id,thunkApi)=>{
     try{
       console.log(id,"id in thunk")
       const docRef=doc(db,"user",id)

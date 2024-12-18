@@ -9,19 +9,25 @@ import { auth } from "./firebase/configFire/config";
 import { useEffect, useState } from "react";
 import { onAuthStateChanged } from "firebase/auth";
 import { fetchuser } from "./redux/Slices/UserSlice";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 function App() {
   const [islogin, setIsLogin] = useState(false);
   const dispatch=useDispatch()
-
+const {currentUser}=useSelector((state)=>state.user)
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
       if (currentUser) {
         // User is signed in
         try {
+          
+          console.log(currentUser.uid,"uid of current user----------Guatam")
+        dispatch(fetchuser(currentUser.uid)).unwrap()
+        .then((data)=>{
+          console.log(data,"daat----->==ppifiowqeyiuq")
           setIsLogin(true);
-          console.log(currentUser.uid,"uid of current user--")
-        dispatch(fetchuser(currentUser.uid))
+        }).catch((error)=>{
+          console.log(error,"error in fectin guser")
+        })
         } catch (error) {
           console.log(error, "error in Apppp??");
           throw new Error(error);
@@ -37,6 +43,7 @@ function App() {
     return () => unsubscribe();
   }, [fetchuser]);
 
+  // if(!currentUser) return <>....Loading</>
   return (
     <Box
       sx={{
@@ -52,9 +59,11 @@ function App() {
       <Box className="w-[90%] h-[90vh] flex  border rounded-[10px]">
         {islogin ? (
           <>
+           {currentUser?<>
             <User />
             <UserChate />
             <Detail />
+           </>:<h1>.....Loading</h1>}
           </>
         ) : (
           <>
