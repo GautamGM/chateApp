@@ -10,6 +10,7 @@ import { useEffect, useState } from "react";
 import { onAuthStateChanged } from "firebase/auth";
 import { fetchuser } from "./redux/Slices/UserSlice";
 import { useDispatch, useSelector } from "react-redux";
+import { toast } from "react-toastify";
 function App() {
   const [islogin, setIsLogin] = useState(false);
   const dispatch=useDispatch()
@@ -19,12 +20,12 @@ const {currentUser}=useSelector((state)=>state.user)
       if (currentUser) {
         // User is signed in
         try {
-          
-          console.log(currentUser.uid,"uid of current user----------Guatam")
         dispatch(fetchuser(currentUser.uid)).unwrap()
         .then((data)=>{
-          console.log(data,"daat----->==ppifiowqeyiuq")
-          setIsLogin(true);
+          if(data){
+
+            setIsLogin(true);
+          }
         }).catch((error)=>{
           console.log(error,"error in fectin guser")
         })
@@ -34,6 +35,7 @@ const {currentUser}=useSelector((state)=>state.user)
         }
       } else {
         // No user is signed in
+        toast.info("user log out")
         console.log("No user logged in");
         setIsLogin(false);
       }

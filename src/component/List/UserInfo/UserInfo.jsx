@@ -5,7 +5,6 @@ import CallIcon from "@mui/icons-material/Call";
 import { useSelector } from "react-redux";
 function UserInfo() {
   const {currentUser}=useSelector((state)=>state.user)
-  console.log(currentUser,"currentUser")
   return (
     <div>
       <Box sx={{ display: "flex", alignItems: "center" }}>

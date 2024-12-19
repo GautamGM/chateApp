@@ -12,6 +12,7 @@ function ChateList() {
   const [open, setOpen] = useState(false);
   const [myChatList, setMyChatLst] = useState([]);
 
+
   const { currentUser } = useSelector((state) => state.user);
   useEffect(() => {
     if (currentUser?.id) {
@@ -20,9 +21,9 @@ function ChateList() {
         async (res) => {
           const items = res.data().chats;
           const promises = items.map(async (item) => {
-            const userDocRef = doc(db, "user", item.receiverId);
-            const user = await getDoc(userDocRef);
-            console.log(user, "USER");
+            const userDocRef = doc(db, "user", item.recieverId);
+            let user = await getDoc(userDocRef);
+            user=user.data() //"USER user in chalist =++++++++");
             return { ...item, user };
           });
           const myChatList = await Promise.all(promises);
@@ -33,8 +34,9 @@ function ChateList() {
         unsub();
       };
     }
-  }, [currentUser?.id]);
+  }, [currentUser.id]);
 
+  console.log(myChatList,"chalist yufgsdaf")
   return (
     <>
       <div className="p-1 ">
@@ -80,7 +82,7 @@ function ChateList() {
                       variant="h6"
                       sx={{ fontSize: "16px", fontWeight: "600" }}
                     >
-                      {chat.usename}
+                      {chat.user.username}
                     </Typography>
                     <Typography>love you</Typography>
                   </Box>

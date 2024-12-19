@@ -6,9 +6,10 @@ import Fade from "@mui/material/Fade";
 import Button from "@mui/material/Button";
 import Typography from "@mui/material/Typography";
 import { useForm } from "react-hook-form";
-import { collection, getDoc, getDocs, query, where } from "firebase/firestore";
+import { arrayUnion, collection, doc, getDoc, getDocs, query, serverTimestamp, setDoc, updateDoc, where } from "firebase/firestore";
 import { db } from "../../../../firebase/configFire/config";
 import { toast } from "react-toastify";
+import { useSelector } from "react-redux";
 const style = {
   position: "absolute",
   top: "50%",
@@ -27,6 +28,7 @@ export default function AddUser({ open, setOpen }) {
   const handleClose = () => setOpen(false);
   const [myuser, setMyUser] = React.useState([]);
 
+  const { currentUser } = useSelector((state) => state.user);
   // const newValue = user.map((prev)=> {return (...prev , newValue)})
   // setUser(newValue)
   const handelsearch = async (data) => {
@@ -41,23 +43,53 @@ export default function AddUser({ open, setOpen }) {
         const userlist = userSnapshot.docs;
         const newValue = userlist.map((elem) => {
           const data = elem.data();
-         return data
+          return data;
         });
 
         setMyUser(newValue);
-      }else{
-       setMyUser([])
-       toast.info("no user found")
+      } else {
+        setMyUser([]);
+        toast.info("no user found");
       }
     } catch (error) {
       console.log(error, "error ");
     }
   };
-  console.log(myuser, "my user----");
-  const hnadelAdd=(id)=>{
-    console.log(myuser,"<-----id through te usestae")
-    console.log(id,"id of the particular usr")
-  }
+ 
+  // handel add user to the chatlist--
+  const hnadelAdd = async (id) => {
+
+    const chatsRef=collection(db,"chats")
+    
+    const userChatsRef=collection(db,"userChats")
+    try{
+      const newChatRef=doc(chatsRef)
+      await setDoc(newChatRef,{
+        createdAt:serverTimestamp(),
+        messages:[],
+      })
+      
+      await updateDoc(doc(userChatsRef,id),{
+        chats:arrayUnion({
+          chatId:newChatRef.id,
+          lastMessage:"",
+          recieverId:currentUser.id,
+          updatedAt:Date.now()
+        })
+      })
+      await updateDoc(doc(userChatsRef,currentUser.id),{
+        chats:arrayUnion({
+          chatId:newChatRef.id,
+          lastMessage:"",
+          recieverId:id,
+          updatedAt:Date.now()
+        })
+      })
+
+    }catch(error){
+      console.log(error)
+    }
+  };
   return (
     <div>
       <Modal
@@ -93,20 +125,25 @@ export default function AddUser({ open, setOpen }) {
             {/* ------------------------------------------------------------search end */}
             <Box>
               {myuser?.map((user) => {
-                console.log(user,"reunuser")
+                console.log(user, "reunuser");
                 return (
-                 <>
-                  <Box className="flex justify-around items-center border mt-4 p-1 rounded-[15px]  bg-black text-white">
-                    <img
-                      draggable={false}
-                      className="border  cover  w-[70px]  h-[70px] rounded-[100%]"
-                      src="https://imgs.search.brave.com/UXdec7X_4yQLzlYzDER10xY05FHewQoj7ueE5pkijhU/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly9tYWNo/b2xldmFudGUuY29t/L3dwLWNvbnRlbnQv/dXBsb2Fkcy8yMDI0/LzEyL2NvbXByZXNz/ZWRfaW1nLXRUYXdQ/ZXdHUU12OFBIWEg0/Q1phbjRveC5wbmc"
-                      alt="pic"
-                    />
-                    <Typography variant="h6">{user.username}</Typography>
-                    <Button variant="contained" onClick={(()=>hnadelAdd(user.id))}>Add+</Button>
-                  </Box>
-                 </>
+                  <>
+                    <Box className="flex justify-around items-center border mt-4 p-1 rounded-[15px]  bg-black text-white">
+                      <img
+                        draggable={false}
+                        className="border  cover  w-[70px]  h-[70px] rounded-[100%]"
+                        src="https://imgs.search.brave.com/UXdec7X_4yQLzlYzDER10xY05FHewQoj7ueE5pkijhU/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly9tYWNo/b2xldmFudGUuY29t/L3dwLWNvbnRlbnQv/dXBsb2Fkcy8yMDI0/LzEyL2NvbXByZXNz/ZWRfaW1nLXRUYXdQ/ZXdHUU12OFBIWEg0/Q1phbjRveC5wbmc"
+                        alt="pic"
+                      />
+                      <Typography variant="h6">{user.username}</Typography>
+                      <Button
+                        variant="contained"
+                        onClick={() => hnadelAdd(user.id)}
+                      >
+                        Add+
+                      </Button>
+                    </Box>
+                  </>
                 );
               })}
             </Box>
