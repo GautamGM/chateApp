@@ -36,25 +36,16 @@ export default function AddUser({ open, setOpen }) {
       let username = data.name;
       // Create a query against the collection.
       const q = query(userRef, where("username", "==", username));
-      console.log(q, "user");
       const userSnapshot = await getDocs(q);
       if (!userSnapshot.empty) {
-        console.log("entered if");
         const userlist = userSnapshot.docs;
         const newValue = userlist.map((elem) => {
-          console.log(elem, "elem");
           const data = elem.data();
-          if(data){
-
-            return data;
-          }else{
-            return null
-          }
+         return data
         });
 
         setMyUser(newValue);
       }else{
-        console.log("hello else")
        setMyUser([])
        toast.info("no user found")
       }
@@ -63,6 +54,10 @@ export default function AddUser({ open, setOpen }) {
     }
   };
   console.log(myuser, "my user----");
+  const hnadelAdd=(id)=>{
+    console.log(myuser,"<-----id through te usestae")
+    console.log(id,"id of the particular usr")
+  }
   return (
     <div>
       <Modal
@@ -109,7 +104,7 @@ export default function AddUser({ open, setOpen }) {
                       alt="pic"
                     />
                     <Typography variant="h6">{user.username}</Typography>
-                    <Button variant="contained">Add+</Button>
+                    <Button variant="contained" onClick={(()=>hnadelAdd(user.id))}>Add+</Button>
                   </Box>
                  </>
                 );
