@@ -8,6 +8,8 @@ import MicIcon from "@mui/icons-material/Mic";
 import SendIcon from "@mui/icons-material/Send";
 import SentimentSatisfiedAltIcon from "@mui/icons-material/SentimentSatisfiedAlt";
 import EmojiPicker from "emoji-picker-react";
+import { doc, onSnapshot } from "firebase/firestore";
+import { db } from "../../firebase/configFire/config";
 function UserChate() {
   const [open, setOpen] = useState(false);
   const [messages, setMessages] = useState([
@@ -32,6 +34,18 @@ function UserChate() {
     setNewMessage((prev) => prev + emoji.emoji);
    
   };
+
+// getting the chat in the function
+useEffect(()=>{
+const unSub=onSnapshot(doc(db,"chats","V9q1UerwkJ9K2UZv8WdX"),(res)=>{
+  console.log(res.data(),"chate data in cahta component")
+})
+
+return ()=>{
+  unSub()
+}
+},[])
+
 
 const endRef=useRef()
 useEffect(()=>{

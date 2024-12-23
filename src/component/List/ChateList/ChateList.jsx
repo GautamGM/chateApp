@@ -12,10 +12,9 @@ function ChateList() {
   const [open, setOpen] = useState(false);
   const [myChatList, setMyChatLst] = useState([]);
 
-
   const { currentUser } = useSelector((state) => state.user);
   useEffect(() => {
-    if (currentUser?.id) {
+    if (currentUser.id) {
       const unsub = onSnapshot(
         doc(db, "userChats", currentUser.id),
         async (res) => {
@@ -23,20 +22,22 @@ function ChateList() {
           const promises = items.map(async (item) => {
             const userDocRef = doc(db, "user", item.recieverId);
             let user = await getDoc(userDocRef);
-            user=user.data() //"USER user in chalist =++++++++");
+            user = user.data(); //"USER user in chalist =++++++++");
             return { ...item, user };
-          });
+          }
+        );
           const myChatList = await Promise.all(promises);
           setMyChatLst(myChatList.sort((a, b) => b.updatedAt - a.updatedAt));
         }
       );
+
       return () => {
         unsub();
       };
     }
   }, [currentUser.id]);
 
-  console.log(myChatList,"chalist yufgsdaf")
+  console.log(myChatList, "chalist yufgsdaf");
   return (
     <>
       <div className="p-1 ">

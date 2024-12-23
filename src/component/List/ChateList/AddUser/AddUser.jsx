@@ -6,7 +6,20 @@ import Fade from "@mui/material/Fade";
 import Button from "@mui/material/Button";
 import Typography from "@mui/material/Typography";
 import { useForm } from "react-hook-form";
-import { arrayUnion, collection, doc, getDoc, getDocs, query, serverTimestamp, setDoc, updateDoc, where } from "firebase/firestore";
+import {
+  arrayUnion,
+  collection,
+  doc,
+  getDoc,
+  getDocs,
+  query,
+  serverTimestamp,
+  setDoc,
+  updateDoc,
+  where,
+  
+} from "firebase/firestore";
+
 import { db } from "../../../../firebase/configFire/config";
 import { toast } from "react-toastify";
 import { useSelector } from "react-redux";
@@ -33,11 +46,11 @@ export default function AddUser({ open, setOpen }) {
   // setUser(newValue)
   const handelsearch = async (data) => {
     console.log(data.name, "serach");
+
     try {
       const userRef = collection(db, "user");
-      let username = data.name;
       // Create a query against the collection.
-      const q = query(userRef, where("username", "==", username));
+      const q = query(userRef, where("username", "==", data.name));
       const userSnapshot = await getDocs(q);
       if (!userSnapshot.empty) {
         const userlist = userSnapshot.docs;
@@ -55,41 +68,85 @@ export default function AddUser({ open, setOpen }) {
       console.log(error, "error ");
     }
   };
- 
+
   // handel add user to the chatlist--
   const hnadelAdd = async (id) => {
+    const chatsRef = collection(db, "chats");
+    const userChatsRef = collection(db, "userChats");
 
-    const chatsRef=collection(db,"chats")
-    
-    const userChatsRef=collection(db,"userChats")
-    try{
-      const newChatRef=doc(chatsRef)
-      await setDoc(newChatRef,{
-        createdAt:serverTimestamp(),
-        messages:[],
-      })
-      
-      await updateDoc(doc(userChatsRef,id),{
-        chats:arrayUnion({
-          chatId:newChatRef.id,
-          lastMessage:"",
-          recieverId:currentUser.id,
-          updatedAt:Date.now()
-        })
-      })
-      await updateDoc(doc(userChatsRef,currentUser.id),{
-        chats:arrayUnion({
-          chatId:newChatRef.id,
-          lastMessage:"",
-          recieverId:id,
-          updatedAt:Date.now()
-        })
-      })
+    try {
+      // Query the current user's chats to see if the chat already exists
+      const currentUserChatsDoc = await getDoc(
+        doc(userChatsRef, currentUser.id)
+      );
+      const currentUserChats = currentUserChatsDoc.exists()
+        ? currentUserChatsDoc.data().chats
+        : [];
 
-    }catch(error){
-      console.log(error)
+      // Check if a chat already exists with the selected user
+      const chatExists = currentUserChats.some(
+        (chat) => chat.recieverId === id
+      );
+
+      if (chatExists) {
+        toast.info("Chat already exists!");
+        return; // Exit if the chat already exists
+      }
+
+      // Create a new chat document in the 'chats' collection
+      const newChatRef = doc(chatsRef);
+      await setDoc(newChatRef, {
+        createdAt: serverTimestamp(),
+        messages: [],
+      });
+
+      // Update both users' `userChats` documents with the new chat
+      const newChatData = {
+        chatId: newChatRef.id,
+        lastMessage: "",
+        recieverId: id,
+        updatedAt: Date.now(),
+      };
+
+      await updateDoc(doc(userChatsRef, id), {
+        chats: arrayUnion({ ...newChatData, recieverId: currentUser.id }),
+      });
+
+      await updateDoc(doc(userChatsRef, currentUser.id), {
+        chats: arrayUnion(newChatData),
+      });
+
+      toast.success("Chat created successfully!");
+    } catch (error) {
+      console.error("Error creating chat: ", error);
+      toast.error("Error creating chat");
     }
   };
+
+  React.useEffect(() => {
+    const fetchChats = async () => {
+      try {
+        // Reference to the chats collection
+        const chatRef = collection(db, "chats");
+
+        // Fetch all chat documents
+        const chatSnapshot = await getDocs(chatRef);
+
+        // Map through the chat documents and log the data
+        const chats = chatSnapshot.docs.map((doc) => ({
+          id: doc.id, // Include the document ID if needed
+          ...doc.data(), // Spread the chat data
+        }));
+
+        console.log(chats, "All chats from Firestore");
+      } catch (error) {
+        console.error("Error fetching chats: ", error);
+      }
+    };
+
+    fetchChats();
+  }, []);
+
   return (
     <div>
       <Modal
@@ -153,3 +210,4 @@ export default function AddUser({ open, setOpen }) {
     </div>
   );
 }
+
